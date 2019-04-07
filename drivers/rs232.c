@@ -24,7 +24,7 @@ void io_write8(uint16_t port, uint8_t val)
 int8_t rs232_is_initialized(rs232_dev_t *d)
 {
     return (d->id == 0 || d->id == 1)
-        && (d->port == 0x3f0 || d->port == 0x2f8);
+        && (d->port == 0x3f8 || d->port == 0x2f8);
 }
 
 int rs232_initialize(rs232_dev_t *d, int which)

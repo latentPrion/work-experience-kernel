@@ -1,14 +1,16 @@
 
 #include <stdarg.h>
 #include <stdint.h>
+#include <arch/ia32/arch.h>
 #include <libc/stdio.h>
 #include <core.h>
 #include <vga.h>
 #include <multiboot.h>
+#include <thread.h>
 
 /* EXPLANATION:
- * This is your stack. It should be large enough, but feel free to change its
- * size if you want (see include/core.h).
+ * This variable, "main_thread", contains your stack. It should be large enough,
+ * but feel free to change its size if you want (see include/core.h).
  *
  * The stack is where temporary variables are stored. Normally when writing a
  * program you don't have to think about the stack because it's allocated for
@@ -19,7 +21,7 @@
  * We place this into the .data section so that memzeroing the .bss section
  * won't zero our stack.
  */
-__attribute__((section(".data.stack"))) uint8_t stack[WEK_STACK_NBYTES];
+__attribute__((section(".data.stack"))) thread_t main_thread;
 
 int main(uint32_t mb_magic, multiboot_info_t *mb_info)
 {
@@ -32,6 +34,12 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
      * Read core/multiboot.c for more info.
      */
     force_keep_multiboot_header();
+
+    /* Do basic CPU setup to stabilize our execution environment */
+    err = arch_init();
+    if (err != 0) {
+        return err;
+    }
 
     /* Initialize our printf function which will initialize our VGA driver and
      * enable us to print to the underlying VGA device. See libc/printf.c and
@@ -62,14 +70,14 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
         "The digital world is your oyster!\n",
         mb_magic, mb_info);
 
-    for(int i=0; i<3; i++) {
-        printf("===========================================================\n");
-    }
-
     /* You should do all of your work starting BELOW here!
      ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
      vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
      */
+    err = thread_init_idle_thread();
+    if (err != 0) {
+        panic("Failed to init idle thread!\n");
+    }
 
     return 0;
 }

@@ -1,0 +1,11 @@
+#ifndef _WEK_THREAD_STATE_H
+#define _WEK_THREAD_STATE_H
+
+enum thread_state {
+    THREAD_STATE_NEW=0,
+    THREAD_STATE_RUNNABLE,
+    THREAD_STATE_BLOCKED,
+    THREAD_STATE_SLEEPING
+};
+
+#endif

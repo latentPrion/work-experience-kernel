@@ -1,4 +1,5 @@
-CORE_A_DEPS:=core/main.o core/multiboot.o
+CORE_A_DEPS:=core/main.o core/multiboot.o core/idle_thread.o core/thread.o \
+	core/scheduler.o
 
 core.a: ${CORE_A_DEPS}
 	${AR} -rcs $@ $^

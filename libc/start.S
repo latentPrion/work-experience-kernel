@@ -3,7 +3,7 @@
 #endif
 
 #include <asm.h>
-#include <core.h>
+#include <arch/ia32/arch.h>
 
 .section .multiboot,"a"
 
@@ -24,8 +24,8 @@
 BEGIN_GLOBAL_FUNCTION(_start)
     cli
 
-    /* Set up stack */
-    movl $stack, %esp
+    /* Set up stack: the stack is the first member of the thread_t struct. */
+    movl $main_thread, %esp
     addl $WEK_STACK_NBYTES, %esp
 
     /* Push multiboot info */

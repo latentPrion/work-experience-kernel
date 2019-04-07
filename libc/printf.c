@@ -1,5 +1,6 @@
 
 #include <stdarg.h>
+#include <arch/ia32/arch.h>
 #include <libc/stdio.h>
 #include <libc/string.h>
 #include <vga.h>

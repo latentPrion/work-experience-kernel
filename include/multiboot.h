@@ -89,7 +89,7 @@
 #define MULTIBOOT_INFO_VBE_INFO		        0x00000800
 #define MULTIBOOT_INFO_FRAMEBUFFER_INFO	        0x00001000
 
-#ifndef ASM_FILE
+#if !defined(ASM_FILE) && !defined(__ASSEMBLER__)
 
 typedef unsigned char		multiboot_uint8_t;
 typedef unsigned short		multiboot_uint16_t;
@@ -271,6 +271,6 @@ struct multiboot_apm_info
 
 multiboot_uint32_t force_keep_multiboot_header(void);
 
-#endif /* ! ASM_FILE */
+#endif /* ! ASM_FILE && !__ASSEMBLER */
 
 #endif /* ! MULTIBOOT_HEADER */

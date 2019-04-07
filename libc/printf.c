@@ -106,6 +106,7 @@ int vprintf(const char *fmt, va_list args)
      * the expanded, processed string to the driver, and have the driver echo
      * the string out to the VGA device.
      */
+    rs232_puts(&rs2320, printf_buffer);
     return vga_alphanum_puts(&vga, printf_buffer);
 }
 

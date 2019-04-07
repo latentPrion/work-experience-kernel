@@ -44,7 +44,7 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
 
     // This is the introductory banner message. Proceed with caution!
     printf(
-        "Hello and welcome to the Trustworthy Systems Work Experience Kernel!\n"
+        "Hello and welcome to the Work Experience Kernel!\n"
         "\t[Multiboot magic %x, multiboot info @paddr %x].\n"
         "======================================================================"
         "==========\n"

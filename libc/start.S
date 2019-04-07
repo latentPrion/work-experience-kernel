@@ -9,6 +9,15 @@
 
 .text
 
+/* This point below, "_start" is where the CPU begins executing our OS kernel.
+ *
+ * Unfortunately there are some things we can only do in Assembly language,
+ * that we cannot do in higher level source code languages.
+ *
+ * So we quickly do a few things here in assembly and then jump into our
+ * high level source code language, known as "The C Programming Language".
+ */
+
 BEGIN_GLOBAL_FUNCTION(_start)
     cli
 

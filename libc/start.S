@@ -16,6 +16,9 @@
  *
  * So we quickly do a few things here in assembly and then jump into our
  * high level source code language, known as "The C Programming Language".
+ *
+ * The line below which says "call main" is the line where we actually get
+ * ourselves out of assembly and into our higher level source language (C).
  */
 
 BEGIN_GLOBAL_FUNCTION(_start)

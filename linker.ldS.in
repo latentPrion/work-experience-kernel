@@ -1,0 +1,63 @@
+#define __ASSEMBLER__
+#include <core.h>
+#include <arch/ia32/arch.h>
+
+#define WEK_HIGH_VADDR_NEXT_PADDR(_secname) \
+    (WEK_PADDR_LOAD + (ADDR(_section) - WEK_VADDR_BASE))
+
+OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
+OUTPUT_ARCH("i386")
+ENTRY(_start)
+
+MEMORY
+{
+    wek_load_paddr (rwx)
+        : ORIGIN = WEK_PADDR_LOAD, LENGTH = 4M
+
+    wek_high_load_vaddr (rwx)
+        : ORIGIN = WEK_VADDR_BASE, LENGTH = 4M
+}
+
+SECTIONS
+{
+    . = WEK_PADDR_LOAD;
+
+    .headers : AT(WEK_PADDR_LOAD) {
+        KEEP(*(.multiboot*))
+    } >wek_load_paddr
+
+    .boot.rx ALIGN(PAGE_SIZE) : AT(ADDR(.boot.rx)) {
+        *(.text*)
+    } >wek_load_paddr
+
+    .boot.ro ALIGN(PAGE_SIZE) : AT(ADDR(.boot.ro)) {
+        *(.rodata*)
+    } >wek_load_paddr
+
+    .boot.rw ALIGN(PAGE_SIZE) : AT(ADDR(.boot.rw)) {
+        *(.data*)
+        . = ALIGN(PAGE_SIZE);
+        __k_bss_start = .;
+        *(.bss*)
+        __k_bss_end = .;
+    } >wek_load_paddr
+
+    . += WEK_VADDR_BASE;
+
+    __k_image_start = .;
+
+    .rx ALIGN(PAGE_SIZE) : AT(WEK_HIGH_VADDR_NEXT_PADDR(.rx)) {
+    } >wek_high_load_vaddr
+
+    .ro ALIGN(PAGE_SIZE) : AT(WEK_HIGH_VADDR_NEXT_PADDR(.ro)) {
+    } >wek_high_load_vaddr
+
+    .rw  ALIGN(PAGE_SIZE) : AT(WEK_HIGH_VADDR_NEXT_PADDR(.rw)) {
+    } >wek_high_load_vaddr
+
+    __k_image_end = .;
+
+    /DISCARD/ : {
+        *(.comment*)
+    }
+}

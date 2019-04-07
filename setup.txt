@@ -1,0 +1,7 @@
+The computer used by the student must have a unix shell, and an i586-elf
+cross toolchain installed and added to $PATH.
+
+In addition, GNU make, Qemu-system-i386 and git must be installed.
+
+Machine queue is recommended to let the student try to run the WEK
+OS once on a real machine, but it's not required.

@@ -6,7 +6,7 @@ WEK_SRC_ROOT:=$(shell pwd)
 # Choose build directory name.
 WEK_PREFIX:=${PREFIX}
 ifeq (${WEK_PREFIX},)
-	WEK_PREFIX:=${WEK_SRC_ROOT}/build
+	WEK_PREFIX:=${WEK_SRC_ROOT}/b
 endif
 
 # Choose default toolchain

@@ -8,4 +8,8 @@ typedef struct rs232_dev_ {
     uint16_t port;
 } rs232_dev_t;
 
+int8_t rs232_is_initialized(rs232_dev_t *d);
+int rs232_initialize(rs232_dev_t *d, int which);
+int rs232_puts(rs232_dev_t *d, const char *str);
+
 #endif

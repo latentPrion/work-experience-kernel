@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <libc/size_t.h>
 #include <rs232.h>
 
 uint8_t io_read8(uint16_t port)
@@ -18,6 +19,12 @@ void io_write8(uint16_t port, uint8_t val)
 	asm volatile("outb %0,%1"
         :
         :"a"(val), "Nd" (port));
+}
+
+int8_t rs232_is_initialized(rs232_dev_t *d)
+{
+    return (d->id == 0 || d->id == 1)
+        && (d->port == 0x3f0 || d->port == 0x2f8);
 }
 
 int rs232_initialize(rs232_dev_t *d, int which)
@@ -56,4 +63,17 @@ int rs232_initialize(rs232_dev_t *d, int which)
 	io_read8(d->port + 6); /* clear modem status d->port */
 
 	return 0;
+}
+
+int rs232_puts(rs232_dev_t *d, const char *str)
+{
+    size_t i;
+
+	for (i=0; str[i] != '\0'; i++)
+	{
+		while (d->port && !(io_read8(d->port + 5) & 0x20));
+		io_write8(d->port, str[i]);
+	};
+
+    return i;
 }

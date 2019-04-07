@@ -3,6 +3,7 @@
 #include <libc/stdio.h>
 #include <libc/string.h>
 #include <vga.h>
+#include <rs232.h>
 #include <core.h>
 
 #define PRINTF_BUFFER_NBYTES (PAGE_SIZE * 2)
@@ -14,6 +15,12 @@
  * underlying VGA alphanumeric mode framebuffer device.
  */
 vga_alphanum_dev_t vga;
+
+/* This is our serial driver instance which we use to print output in machine
+ * queue since machine queue only listens for output from the machines via
+ * serial.
+ */
+rs232_dev_t rs2320;
 
 /* EXPLANATION:
  * We need someplace to expand the printf formatting into, so let's reserve a
@@ -37,6 +44,14 @@ int printf_init(void)
         return err;
     }
 
+    /* This line initializes the serial device to 115200 baud 8n1 and prepares
+     * it for kernel messages.
+     */
+    err = rs232_initialize(&rs2320, 0);
+    if (err != 0) {
+        return err;
+    }
+
     /* This line below clears the screen. Uncomment it if you want to see
      * the messages that the bootloader printed before we cleared it.
      */
@@ -46,7 +61,7 @@ int printf_init(void)
 
 int8_t printf_is_initialized(void)
 {
-    return vga_alphanum_is_initialized(&vga);
+    return vga_alphanum_is_initialized(&vga) && rs232_is_initialized(&rs2320);
 }
 
 int printf(const char *fmt, ...)

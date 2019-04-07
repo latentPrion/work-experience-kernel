@@ -1,0 +1,1 @@
+CC=i586-elf-gcc AS=i586-elf-as LD=i586-elf-gcc CPP='i586-elf-gcc -E' make $*

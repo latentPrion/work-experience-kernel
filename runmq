@@ -1,0 +1,3 @@
+
+~/bin/machine_queue/mq.sh run -c "All is well in the universe." -l output \
+	-s x86_pool -f "kernel.elf" -f "kernel.elf"

@@ -1,4 +1,4 @@
-DRIVERS_A_DEPS:=drivers/vga.o
+DRIVERS_A_DEPS:=drivers/vga.o drivers/rs232.o
 
 drivers.a: ${DRIVERS_A_DEPS}
 	${AR} -rcs $@ $^

@@ -310,9 +310,9 @@ int vsnprintf(char *buff, size_t buffMax, const char *str, va_list args)
 			break;
 		}
 
-/* Disable support for paddr_t */
-#if 0
 		case 'P': {
+            typedef uint64_t paddr_t;
+            const unsigned int __VADDR_NBITS__=32, __BITS_PER_BYTE__=8;
 			paddr_t *ppnum = va_arg(args, paddr_t*);
 			char	*prefix = "Px";
 
@@ -327,17 +327,16 @@ int vsnprintf(char *buff, size_t buffMax, const char *str, va_list args)
 				nPrinted += sprintnum(
 					&buff[buffIndex + nPrinted],
 					buffMax - (buffIndex + nPrinted),
-					pnum.getLow(), 16, 0, 1);
+					(pnum & 0xFFFFFFFF), 16, 0, 1);
 
 				buff[buffIndex + nPrinted++] = '_';
 			};
 
 			nPrinted += sprintnum(
 				&buff[buffIndex + nPrinted], buffMax - buffIndex,
-				ppnum->getLow(), 16, 0, 1);
+				(*ppnum & 0xFFFFFFFF), 16, 0, 1);
 			break;
 		}
-#endif
 
 		// Non recursive string printing.
 		case 's': {

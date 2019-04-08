@@ -30,6 +30,7 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
 
     (void)mb_magic;
     (void)mb_info;
+    multiboot_memory_map_t *mmap_start, *mmap_end, *mmap_current_entry;
 
     /* Force multiboot header to be emitted.
      * Read core/multiboot.c for more info.
@@ -71,10 +72,40 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
         "The digital world is your oyster!\n",
         mb_magic, mb_info);
 
+
     /* You should do all of your work starting BELOW here!
      ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
      vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
      */
+
+    /* Put your printf for the mem_upper and mem_lower memory size here! */
+
+    if ((mb_info->flags & MULTIBOOT_INFO_MEM_MAP) == 0)
+    {
+        printf("The bootloader didn't supply us with a memory map!\n");
+    }
+    else
+    {
+        mmap_start = (multiboot_memory_map_t *)mb_info->mmap_addr;
+        mmap_end = (multiboot_memory_map_t *)
+            (mb_info->mmap_addr + mb_info->mmap_length);
+
+        printf("Memory map: At paddr %x, length %d\n",
+            mb_info->mmap_addr, mb_info->mmap_length);
+
+        mmap_current_entry = mmap_start;
+        while (mmap_current_entry < mmap_end)
+        {
+            /* Put your printf for the memory map in here! */
+
+
+            mmap_current_entry = (multiboot_memory_map_t *)
+                ((uintptr_t)mmap_current_entry
+                    + mmap_current_entry->size
+                    + sizeof(mmap_current_entry->size));
+        }
+    }
+
     err = thread_init_idle_thread();
     if (err != 0) {
         panic("Failed to init idle thread!\n");

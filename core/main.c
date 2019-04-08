@@ -69,7 +69,8 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
         "MacOS? Well, why complain when you can write your own and fix those "
         "problems? Do you trust commercial OSes to be secure? No? Then why not "
         "write your own, and make it more secure?\n\n"
-        "The digital world is your oyster!\n",
+        "The digital world is your oyster!\n\n"
+        "===================================================================\n",
         mb_magic, mb_info);
 
 
@@ -80,8 +81,7 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
 
     /* Put your printf for the mem_upper and mem_lower memory size here! */
 
-    if ((mb_info->flags & MULTIBOOT_INFO_MEM_MAP) == 0)
-    {
+    if ((mb_info->flags & MULTIBOOT_INFO_MEM_MAP) == 0) {
         printf("The bootloader didn't supply us with a memory map!\n");
     }
     else

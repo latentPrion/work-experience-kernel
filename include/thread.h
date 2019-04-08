@@ -8,12 +8,23 @@
 #include <thread_state.h>
 
 typedef struct thread_ {
+    /* This is the ring0 stack. */
     uint8_t stack[WEK_STACK_NBYTES];
     list_element_t scheduler_list;
     enum thread_state thread_state;
     int id;
-    reg_context_t regs;
+    /* This reg_context_t is only used for userspace threads.
+     * Kernel threads save and restore their reg context on their stacks.
+     */
+    reg_context_t regs1;
+    /* Per the above comment, this is a pointer to an offset within the stack of
+     * the thread.
+     */
+    reg_context_t *regs0;
 } thread_t;
+
+#define MAIN_THREAD_ID (1)
+#define IDLE_THREAD_ID (2)
 
 extern thread_t idle_thread, main_thread;
 

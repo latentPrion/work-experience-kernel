@@ -18,29 +18,39 @@ BEGIN_GLOBAL_FUNCTION(reg_context_pop_into_cpu)
 END_FUNCTION(reg_context_pop_into_cpu)
 
 BEGIN_GLOBAL_FUNCTION(reg_context_save_snapshot_and_switch)
-    /* At this point:
+    /* EXPLANATION
+     *  void reg_context_save_snapshot_and_switch(
+     *      void **old_threads_stack0_current_level,
+     *      void *new_threads_stack0_current_level);
+     *
+     * At this point:
      * ESP+0 = RetEIP
-     * ESP+4 = old thread's reg context
-     * ESP+8 = new thread's reg context
+     * ESP+4 = old_threads_stack0_current_level
+     * ESP+8 = new_threads_stack0_current_level
      */
     pushfl
     /* Skip cs, eip, errorCode and vectorNo */
     subl $16, %esp
     pushal
-    pushw %fs
-    pushw %gs
-    pushw %ds
-    pushw %es
+    pushl %fs
+    pushl %gs
+    pushl %ds
+    pushl %es
 
-    /* Now load the reg context of the new thread.
-     * Eax should be free right now.
-     */
-    movl 68(%esp), %eax
+    /* EAX should be free for use right now. */
+
+    /* return the current stack pointer to the caller. */
+    movl 72(%esp), %eax
+    movl %esp, (%eax)
+
+    /* Now load the reg context of the new thread. */
+    movl 76(%esp), %eax
     movl %eax, %esp
-    popw %es
-    popw %ds
-    popw %gs
-    popw %fs
+
+    popl %es
+    popl %ds
+    popl %gs
+    popl %fs
     popal
     addl $16, %esp
     popfl

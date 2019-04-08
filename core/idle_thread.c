@@ -3,8 +3,6 @@
 #include <libc/stdio.h>
 #include <thread.h>
 
-#define IDLE_THREAD_ID (2)
-
 thread_t idle_thread;
 
 static void idle_thread_main(void)
@@ -12,7 +10,7 @@ static void idle_thread_main(void)
     printf("Entering idle thread!\n");
 
     for (;;) {
-//        asm volatile ("hlt\n\t");
+        asm volatile("pause\n");
         scheduler_yield();
     }
 }

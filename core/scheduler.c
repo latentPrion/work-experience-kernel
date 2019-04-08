@@ -1,4 +1,5 @@
 #include <libc/string.h>
+#include <libc/stdio.h>
 #include <core.h>
 #include <scheduler.h>
 #include <linked_list.h>
@@ -34,8 +35,6 @@ int scheduler_init(void)
     }
 
     set_current_thread(&main_thread);
-//    scheduler_add_thread(init_thread);
-//    scheduler_add_thread(idle_thread);
     return 0;
 }
 
@@ -54,7 +53,15 @@ int scheduler_wake_thread(thread_t *t)
         panic("wake_thread: Attempt to wake runnable thread!\n");
     }
 
-    list_append(&scheduler.runqueue, &t->scheduler_list);
+    if (!(t->thread_state == THREAD_STATE_NEW && t == &main_thread))
+    {
+        /* If the main thread is being newly added to the runqueue at boot, we
+         * can't actually add it to the runqueue since it's the currently
+         * executing thread -- and the currently executing thread shouldn't be
+         * in the runqueue.
+         */
+        list_append(&scheduler.runqueue, &t->scheduler_list);
+    }
 
     if (t->thread_state == THREAD_STATE_BLOCKED) {
         scheduler.n_blocked--;
@@ -127,18 +134,32 @@ static thread_t *scheduler_get_next_thread(void)
 
 static void scheduler_switch_to_next_thread(void)
 {
-    thread_t *next;
+    thread_t *next, *curr;
 
     next = scheduler_get_next_thread();
     if (next == NULL) {
         panic("pull: get_next_thread() returned NULL!\n");
     }
 
-    // This line below is the exact moment when the threads are switched.
-    reg_context_save_snapshot_and_switch(
-        &get_current_thread()->regs, &next->regs);
+    if (list_remove(&scheduler.runqueue, &next->scheduler_list) == 0) {
+        panic("pull: just popped a thread from runqueue, but found it in the "
+            "queue again!\n");
+    }
 
-    set_current_thread(next);
+    curr = get_current_thread();
+    if (next != curr)
+    {
+        /* Can't call set_current_thread() after the save_snap_and_switch()
+         * because then the set_current_thread() line won't be executed until
+         * after the thread that gets suspended is eventually rescheduled -- and
+         * that would mean that in the interim, the scheduler's metadata for
+         * the current thread is not up to date.
+         */
+        set_current_thread(next);
+        // This line below is the exact moment when the threads are switched.
+        reg_context_save_snapshot_and_switch(
+            &curr->regs0, next->regs0);
+    }
 }
 
 __attribute__((unused))

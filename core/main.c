@@ -7,6 +7,7 @@
 #include <vga.h>
 #include <multiboot.h>
 #include <thread.h>
+#include <scheduler.h>
 
 /* EXPLANATION:
  * This variable, "main_thread", contains your stack. It should be large enough,
@@ -79,6 +80,20 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
         panic("Failed to init idle thread!\n");
     }
 
+    err = thread_init_main_thread();
+    if (err != 0) {
+        panic("Failed to init main thread!\n");
+    }
+
+    err = scheduler_init();
+    if (err != 0) {
+        panic("Failed to init scheduler!\n");
+    }
+
+    scheduler_add_thread(&main_thread);
+    scheduler_add_thread(&idle_thread);
+
+    scheduler_kill_thread(&main_thread);
     return 0;
 }
 

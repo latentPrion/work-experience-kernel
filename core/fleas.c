@@ -12,25 +12,21 @@ thread_t fleas1, fleas2, fleas3, fleas4;
 void fleas1_main(void)
 {
     /* Put your printf here! */
-    printf("Fleas1\n");
 }
 
 void fleas2_main(void)
 {
     /* Put your printf here! */
-    printf("Fleas2\n");
 }
 
 void fleas3_main(void)
 {
     /* Put your printf here! */
-    printf("Fleas3\n");
 }
 
 void fleas4_main(void)
 {
     /* Put your printf here! */
-    printf("Fleas4\n");
 }
 
 /** EXPLANATION:

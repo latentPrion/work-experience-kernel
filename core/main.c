@@ -116,6 +116,11 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
         panic("Failed to init main thread!\n");
     }
 
+    err = all_fleas_init();
+    if (err != 0) {
+        panic("Failed to init flea threads!\n");
+    }
+
     err = scheduler_init();
     if (err != 0) {
         panic("Failed to init scheduler!\n");
@@ -123,6 +128,10 @@ int main(uint32_t mb_magic, multiboot_info_t *mb_info)
 
     scheduler_add_thread(&main_thread);
     scheduler_add_thread(&idle_thread);
+
+    /* Add your scheduler_add_thread() invocations here! */
+
+
 
     scheduler_kill_thread(&main_thread);
     return 0;

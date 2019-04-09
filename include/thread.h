@@ -27,9 +27,11 @@ typedef struct thread_ {
 #define IDLE_THREAD_ID (2)
 
 extern thread_t idle_thread, main_thread;
+extern thread_t fleas1, fleas2, fleas3, fleas4;
 
 int thread_init(thread_t *t, int tid, void (*entry_vaddr)(void));
 int thread_init_idle_thread(void);
 int thread_init_main_thread(void);
+int all_fleas_init(void);
 
 #endif

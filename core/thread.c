@@ -2,6 +2,17 @@
 #include <libc/stdio.h>
 #include <thread.h>
 #include <core.h>
+#include <scheduler.h>
+
+
+void thread__start(thread_t *self, void (*arg)())
+{
+    /* The arg passed to the new thread on its stack is its entry point. */
+    arg();
+
+    /* We just kill the thread if/when it returns. */
+    scheduler_kill_thread(self);
+}
 
 int thread_init(thread_t *t, int tid, void (*entry_vaddr)(void))
 {
@@ -15,7 +26,22 @@ int thread_init(thread_t *t, int tid, void (*entry_vaddr)(void))
     t->id = tid;
     t->thread_state = THREAD_STATE_NEW;
 
-    t->regs0 = (reg_context_t *)&t->stack[WEK_STACK_NBYTES - sizeof(*t->regs0)];
+    /* The extra 2 words of space we reserve at the bottom
+     * are for setting up the stack of the new thread as if it was called with
+     * an argument passed to it on its stack.
+     *
+     * We need the stack to look like:
+     *      | EIP            |
+     *      | thread_t *self |
+     *      | void *arg      |
+     *
+     * So that's what the 2 words are for.
+     *
+     * This only applies to kernel threads and not to user threads.
+     */
+    t->regs0 = (reg_context_t *)&t->stack[
+        WEK_STACK_NBYTES - sizeof(*t->regs0)
+        - (sizeof(uintptr_t) * 2)];
 
     // Do *NOT* edit the main thread's stack while it's using it!
     if (t != &main_thread)
@@ -27,7 +53,8 @@ int thread_init(thread_t *t, int tid, void (*entry_vaddr)(void))
         }
 
         reg_context_set_stack(t->regs0, 0, t->stack);
-        reg_context_set_entry_point(t->regs0, 0, entry_vaddr);
+        reg_context_set_entry_point(t->regs0, 0, (void (*)())&thread__start);
+        reg_context_setup_stack_args(t->regs0, t, entry_vaddr);
     }
 
     err = reg_context_init(&t->regs1, 1);

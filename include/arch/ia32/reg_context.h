@@ -75,6 +75,26 @@ static inline int reg_context_init(reg_context_t *r, uint8_t regs0_or_regs1)
     return 0;
 }
 
+struct thread_;
+
+static inline void reg_context_setup_stack_args(
+    reg_context_t *r, struct thread_ *t, void (*arg)())
+{
+    uintptr_t *stack_arg_location;
+
+    /* We leave r->ss as it is.
+     *
+     * Note well that r->ss in this situation represents the EIP return address
+     * on the stack. But since thread__start should never return, we can
+     * neglect to set it.
+     *
+     * That aside, all we need to do it just set the stack arg.
+     */
+    stack_arg_location = (uintptr_t *)&r[1];
+    stack_arg_location[0] = (uintptr_t)t;
+    stack_arg_location[1] = (uintptr_t)arg;
+}
+
 void reg_context_save_snapshot_and_switch(
     reg_context_t **old_threads_stack0_current_level,
     reg_context_t *new_threads_stack0_current_level);
